@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Approval Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+    <h1>Loan Approval Prediction</h1>
+    <p class="subtitle">Machine Learning mini-project &mdash; enter applicant details to get a model estimate.</p>
+
+    {% if load_error %}
+    <div class="alert alert-error">{{ load_error }}</div>
+    {% endif %}
+
+    {% if quality_warning %}
+    <div class="alert alert-warning">
+        <strong>Model quality notice:</strong> {{ quality_warning }}
+    </div>
+    {% endif %}
+
+    {% if errors %}
+    <div class="alert alert-error">
+        <strong>Please fix the following:</strong>
+        <ul>
+            {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    <form method="POST" novalidate>
+        <div class="grid">
+            {% for f in numeric_fields %}
+            <div class="field">
+                <label for="{{ f.name }}">{{ f.label }}</label>
+                <input type="number" id="{{ f.name }}" name="{{ f.name }}"
+                       min="{{ f.min }}" max="{{ f.max }}" step="1"
+                       placeholder="{{ f.placeholder }}"
+                       value="{{ form.get(f.name, '') }}" required>
+                <small>Supported: {{ '{:,}'.format(f.min) }} &ndash; {{ '{:,}'.format(f.max) }}</small>
+            </div>
+            {% endfor %}
+
+            <div class="field">
+                <label for="education">Education</label>
+                <select id="education" name="education" required>
+                    {% for opt in categories.get('education', []) %}
+                    <option value="{{ opt }}" {% if form.get('education') == opt %}selected{% endif %}>{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="self_employed">Self employed</label>
+                <select id="self_employed" name="self_employed" required>
+                    {% for opt in categories.get('self_employed', []) %}
+                    <option value="{{ opt }}" {% if form.get('self_employed') == opt %}selected{% endif %}>{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <button type="submit" {% if load_error %}disabled{% endif %}>Predict</button>
+    </form>
+
+    {% if result %}
+    <div class="result {{ 'approved' if result.approved else 'rejected' }}">
+        <h2>Loan {{ 'APPROVED' if result.approved else 'REJECTED' }}</h2>
+        <p class="prob">Estimated approval probability: <strong>{{ result.probability }}%</strong></p>
+        <p class="detail">
+            Decision rule: approved if the estimated probability is at least {{ result.threshold }}%
+            (threshold chosen from training data). Model: {{ result.model }}.
+        </p>
+    </div>
+    {% endif %}
+
+    <p class="disclaimer">
+        This is an ML model estimate for educational purposes and not a guaranteed loan approval or a
+        real banking decision. The probability is an estimate from a statistical model trained on a
+        sample dataset.
+    </p>
+</div>
+</body>
+</html>
