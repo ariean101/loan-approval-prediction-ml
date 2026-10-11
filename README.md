@@ -1,4 +1,3 @@
-
 # Loan Approval Prediction Using Machine Learning
 
 A 7th-semester Computer Engineering ML mini-project. It trains and compares several scikit-learn classifiers on a loan-application dataset, selects the best one with cross-validation, tunes a decision threshold, calibrates probabilities, and serves the result through a Flask web app with input validation.
